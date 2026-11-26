@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>和 AI 開新專案</title>
+<style>
+  :root {
+    --bg: #f7f5f0;
+    --surface: #ffffff;
+    --text: #23211d;
+    --muted: #6b665c;
+    --line: #e2ddd2;
+    --accent: #1f6f6b;
+    --accent-soft: #e3f0ee;
+    --code-bg: #f1eee7;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #17181a;
+      --surface: #202225;
+      --text: #e9e6df;
+      --muted: #a39e93;
+      --line: #34373b;
+      --accent: #6fc7c0;
+      --accent-soft: #1d3432;
+      --code-bg: #121315;
+    }
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: system-ui, -apple-system, "Segoe UI", "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+    font-size: 17px;
+    line-height: 1.8;
+  }
+  main { max-width: 780px; margin: 0 auto; padding: 32px 16px 80px; }
+  h1 { font-size: 2rem; line-height: 1.3; margin: 0 0 12px; letter-spacing: 0.01em; }
+  h2 { font-size: 1.35rem; line-height: 1.4; margin: 56px 0 12px; }
+  h3 { font-size: 1.1rem; margin: 0 0 8px; line-height: 1.5; }
+  p { margin: 0 0 14px; }
+  a { color: var(--accent); }
+  .lede { color: var(--muted); font-size: 1.05rem; margin-bottom: 28px; }
+  .note { color: var(--muted); font-size: 0.9rem; }
+
+  nav.pages { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 32px; }
+  nav.pages a {
+    text-decoration: none; font-size: 0.9rem; padding: 4px 14px; border-radius: 999px;
+    border: 1px solid var(--line); color: var(--muted); background: var(--surface);
+  }
+  nav.pages a[aria-current="page"] { background: var(--accent-soft); color: var(--accent); border-color: transparent; font-weight: 700; }
+
+  .map { list-style: none; margin: 20px 0 0; padding: 0; display: grid; gap: 8px; }
+  .map li {
+    display: grid; grid-template-columns: 2.2em 1fr; gap: 10px; align-items: baseline;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 10px 14px; margin: 0;
+  }
+  .map .n { color: var(--accent); font-weight: 700; font-variant-numeric: tabular-nums; }
+  .map .what { color: var(--muted); font-size: 0.92rem; display: block; }
+
+  .stage {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
+    padding: 22px 22px 8px; margin: 18px 0;
+  }
+  .stage .tag {
+    display: inline-block; background: var(--accent-soft); color: var(--accent);
+    font-size: 0.8rem; font-weight: 700; border-radius: 999px; padding: 2px 12px; margin-bottom: 8px;
+  }
+  .seen {
+    border-left: 3px solid var(--accent); padding: 2px 0 2px 12px; margin: 0 0 14px;
+    color: var(--muted); font-size: 0.92rem;
+  }
+
+  .chat { display: grid; gap: 8px; margin: 0 0 8px; }
+  .turn {
+    display: grid; grid-template-columns: 2.6em 1fr; gap: 10px; align-items: baseline;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 10px 14px;
+  }
+  .turn.ai { background: var(--accent-soft); border-color: transparent; }
+  .turn .who { color: var(--muted); font-size: 0.8rem; font-weight: 700; }
+  .aside { color: var(--muted); font-size: 0.88rem; margin: 0 0 18px 4px; }
+
+  pre {
+    background: var(--code-bg); border: 1px solid var(--line); border-radius: 10px;
+    padding: 14px 16px; overflow-x: auto; font-size: 0.88rem; line-height: 1.7; margin: 0 0 16px;
+    font-family: ui-monospace, "Cascadia Mono", Consolas, "Noto Sans Mono CJK TC", monospace;
+    white-space: pre-wrap; word-break: break-word;
+  }
+  code {
+    font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+    background: var(--code-bg); border-radius: 4px; padding: 1px 5px; font-size: 0.9em;
+  }
+  pre code { background: none; padding: 0; font-size: inherit; }
+  .label { color: var(--muted); font-size: 0.85rem; margin: 0 0 6px; }
+
+  .table-wrap { overflow-x: auto; margin: 0 0 16px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+  table { border-collapse: collapse; width: 100%; font-size: 0.93rem; min-width: 520px; }
+  th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--muted); font-weight: 600; font-size: 0.85rem; }
+  tr:last-child td { border-bottom: none; }
+
+  ul { padding-left: 1.3em; margin: 0 0 14px; }
+  li { margin-bottom: 4px; }
+
+  .tips { background: var(--accent-soft); border-radius: 14px; padding: 22px 22px 10px; margin-top: 16px; }
+  .tips ol { padding-left: 1.4em; margin: 0 0 12px; }
+  .tips li { margin-bottom: 10px; }
+
+  footer { margin-top: 56px; padding-top: 20px; border-top: 1px solid var(--line); }
+</style>
+</head>
+<body>
+<main>
+
+<nav class="pages">
+  <a href="new-project-workflow.html" aria-current="page">開新專案</a>
+  <a href="iteration-workflow.html">問題迭代</a>
+</nav>
+
+<h1>和 AI 開新專案：從一句話的想法到第一版能用</h1>
+<p class="lede">從近一個月在 Codex 上三個專案的對話紀錄整理出來的。這頁只講到第一版做出來為止，之後怎麼改寫在〈<a href="iteration-workflow.html">問題迭代</a>〉。</p>
+
+<h2>先講結論</h2>
+<p>動手之前有五件事：先問能不能做、先查別人怎麼做、讓 AI 把需求問清楚、不懂的地方問到懂、出一份短計畫。這五件事都還沒寫任何程式。</p>
+<p>像蓋房子之前先跟設計師談。談的過程沒有一塊磚，但房子會不會蓋歪，多半在這時候就決定了。</p>
+
+<h2>常見的壞法</h2>
+<p>最常見的做法是丟一句「幫我做一個記帳 app」。AI 會一口氣生出一大包東西，看起來能跑。改到第三次需求，新舊程式開始互相打架。再過幾輪，沒有人說得出現在到底是什麼狀態。</p>
+<p>這等於還沒跟設計師談過，就請施工隊把整棟蓋完。</p>
+
+<h2>三種開場</h2>
+<p>紀錄裡的三個專案，開場剛好各是一種。</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>情況</th><th>第一句怎麼講</th></tr></thead>
+  <tbody>
+    <tr><td>從零開始</td><td>「我想做〈某個東西〉，可行性如何？」並附上參考的網址</td></tr>
+    <tr><td>拿現成的來用</td><td>「幫我把〈網址〉拉下來，看能不能在這台電腦跑。不能的話修一下。」</td></tr>
+    <tr><td>在現有的東西上加一大塊</td><td>「有沒有機會讓它〈做到某件事〉？」談出方向之後接一句「我們來規劃細節」</td></tr>
+  </tbody>
+</table>
+</div>
+<p>三種的共同點是第一句都在問，沒有直接叫它做。</p>
+
+<h2>六個步驟</h2>
+<ol class="map">
+  <li><span class="n">1</span><span>問能不能做，先不叫它做<span class="what">可行性、限制、額外費用</span></span></li>
+  <li><span class="n">2</span><span>先查再選<span class="what">現成方案、評測、互相比較</span></span></li>
+  <li><span class="n">3</span><span>讓 AI 出題<span class="what">一題一題問，用題號回答</span></span></li>
+  <li><span class="n">4</span><span>聽不懂就問，不同意就講<span class="what">對某一句話直接加註</span></span></li>
+  <li><span class="n">5</span><span>選定之後，重新確認一次規格<span class="what">範圍要縮小就明講</span></span></li>
+  <li><span class="n">6</span><span>出一份短計畫，確認後才動手<span class="what">最後一段是怎樣算做好</span></span></li>
+</ol>
+
+<h2>每一步怎麼做</h2>
+
+<section class="stage">
+  <span class="tag">第 1 步</span>
+  <h3>問能不能做，先不叫它做</h3>
+  <p>開場是一句話的想法，後面接「可行性如何」。要問出來的是限制、額外費用、最可能卡住的地方。</p>
+  <p><strong>技巧：把網址貼給它。</strong>想做的東西如果有參考對象，例如某個現成的工具或網站，直接貼官方網址。AI 會自己去讀，比用形容的準。</p>
+  <p><strong>技巧：順便講自己的條件。</strong>在哪裡用、想放在哪裡、有沒有已經在付費的服務。這些會直接影響它的建議。</p>
+  <p class="seen">紀錄裡有 22 則訊息帶著網址。</p>
+  <p class="label">講法</p>
+  <pre><code>我想做〈一句話描述〉，可行性如何？
+參考的東西在這裡：〈網址〉
+我主要在手機上用，希望放在自己的雲端帳號。</code></pre>
+</section>
+
+<section class="stage">
+  <span class="tag">第 2 步</span>
+  <h3>先查再選</h3>
+  <p>動手之前先看別人怎麼做。請 AI 上網找現成的方案、評測、教學，比較之後再選。紀錄裡有一個專案原本想用 A 方案，查完評測之後改用 B 方案加一個外掛。</p>
+  <p><strong>技巧：用「我猜」把猜測丟給它查。</strong>不確定的事不用自己先查好。講「我猜應該有外掛能解決這個問題？」，它會去找。</p>
+  <p><strong>技巧：中途加入比較對象。</strong>談到一半想到另一個選項，直接丟進來要它一起比。</p>
+  <p><strong>技巧：把另一個 AI 的回答貼進來。</strong>同一個問題也問別的 AI，把答案貼過來請它回應。兩邊講法不一樣的地方，通常就是需要再查的地方。</p>
+  <p><strong>技巧：要它對照自己的用法來評估。</strong>只問「哪個好」會得到泛泛的答案。講清楚自己怎麼用，再問適不適合。</p>
+  <p class="seen">要求上網查出現 22 次，提到比較 23 次，「我猜」7 次，貼其他 AI 的回答 4 次。</p>
+  <p class="label">講法</p>
+  <pre><code>幫我深入看這些評測，評估適不適合我這種用法。
+也看看有哪些限制和額外費用。</code></pre>
+</section>
+
+<section class="stage">
+  <span class="tag">第 3 步</span>
+  <h3>讓 AI 出題</h3>
+  <p>這一步最花工夫。讓 AI 反過來當訪談的人，一題一題問，問到沒有模糊的地方才停。規格沒有另外寫成文件，這一輪問答的結果就是規格。</p>
+  <p>題目長這樣，每一題都附上它的建議：</p>
+  <pre><code>Q1 — 使用範圍：是自己用，還是會開給朋友各自保存資料？
+建議：先做單人版，電腦和手機都能用。
+
+Q2 — 使用人數：預計總共幾個人用，最多幾個人同時用？
+建議：先限定受邀的朋友。</code></pre>
+  <p><strong>技巧：用題號和選項字母回答。</strong>不用寫長文。「Q1 自己用。Q2 最多三個人。」就夠了。選項有字母的時候，回「a b c f」。</p>
+  <p><strong>技巧：回答裡順便反問。</strong>例如「a b c f。f 可以做成能開關的嗎？」答案和新問題一起丟。</p>
+  <p><strong>技巧：沒想法的題目就照建議。</strong>每題都有建議，就是為了不用每題都自己想。</p>
+  <p class="seen">紀錄裡用的是一個叫 grill-me 的 skill，被叫出來 17 次。用題號回答的訊息 32 則，題號最多編到 Q53。另外有 45 次是 AI 丟出選擇題，直接點選回答。</p>
+  <p class="label">沒有這個 skill 的時候可以這樣講</p>
+  <pre><code>用一題一題的方式把規格問清楚，每題給選項和建議。
+我會用題號回答。問到沒有模糊的地方再停。</code></pre>
+</section>
+
+<section class="stage">
+  <span class="tag">第 4 步</span>
+  <h3>聽不懂就問，不同意就講</h3>
+  <p>AI 的建議不直接照收。看不懂的詞當場問，會花錢的地方當場問，不想要的就直接說不要，並講出想要的是什麼。</p>
+  <p><strong>技巧：對某一句話直接加註。</strong>Codex 可以選取 AI 回答裡的一段文字，在上面寫評語，像在文件上畫線、在旁邊寫字。一次可以對好幾段各寫一句。</p>
+  <p>這比重打一大段說明快，AI 也清楚知道是在講哪一句。</p>
+  <p>沒有這個功能的工具，把那句話複製貼上，下面接評語，效果一樣。</p>
+  <p class="seen">加註出現 35 次，是這頁列的技巧裡次數最多的。問費用 12 次，要例子或連結 13 次，要求精簡 13 次。</p>
+  <p class="label">加註大概長這樣</p>
+  <pre><code>「建議每次都手動整理一次資料」
+→ 這是什麼意思？我不要手動，我希望全自動。
+
+「這個做法每一筆都會多呼叫一次服務」
+→ 這樣費用會不會暴增？</code></pre>
+</section>
+
+<section class="stage">
+  <span class="tag">第 5 步</span>
+  <h3>選定之後，重新確認一次規格</h3>
+  <p>前面查資料、比較的時候，方案可能已經換過了。選定之後，針對選定的方案再問一輪，題號從 Q1 重新開始。前一輪的答案不一定還適用。</p>
+  <p><strong>技巧：範圍要縮小就明講。</strong>談著談著東西會越長越多。發現太大的時候直接講哪些先不做。</p>
+  <p class="seen">「重新確認規格」這類講法出現 7 次，「暫時不用」「先做這個就好」這類出現 11 次。</p>
+  <p class="label">講法</p>
+  <pre><code>好，那就用〈選定的方案〉。我們重新確認規格。
+我希望可以〈第一件事〉、〈第二件事〉。</code></pre>
+  <pre><code>抱歉，只重新設計〈這一頁〉就好，〈另一頁〉暫時不用。</code></pre>
+</section>
+
+<section class="stage">
+  <span class="tag">第 6 步</span>
+  <h3>出一份短計畫，確認後才動手</h3>
+  <p>規格問清楚之後，切到計畫模式。這個模式下 AI 只寫計畫，不會動任何檔案。</p>
+  <p>計畫很短，一份只管一個功能。看計畫的時候一樣可以加註。看過沒問題，回一句照計畫做，這時候才開始寫程式。</p>
+  <p><strong>技巧：開始規劃前先換成最好的模型。</strong>紀錄裡有一次談到一半，先講「等等，我升級一下模型，我們來規劃細節」，換好才繼續。</p>
+  <p><strong>技巧：計畫的最後一段要寫怎樣算做好。</strong>做完之後就照這一段來檢查。</p>
+  <p class="seen">紀錄裡有 10 份計畫，長度都在 19 到 64 行之間，分三到五段。「照這份計畫實作」出現 7 次。</p>
+  <p class="label">講法</p>
+  <pre><code>幫我切成計畫模式。</code></pre>
+  <p class="label">看完之後</p>
+  <pre><code>照這份計畫實作。</code></pre>
+</section>
+
+<h2>一段完整的範例</h2>
+<p>題材換成一個虛構的食譜工具。對話的順序和講法照實際紀錄。</p>
+
+<div class="chat">
+  <div class="turn"><span class="who">人</span><span>我想自己架〈某個開源的食譜管理工具〉來用，希望可以從〈某個食譜網站〉搜尋食譜存進來。可行性如何？官方網址：〈網址〉</span></div>
+  <div class="turn"><span class="who">人</span><span>對了，程式碼我希望放在自己的帳號下，然後部署到我的雲端。</span></div>
+</div>
+<p class="aside">第 1 步。問可行性，貼網址，講自己的條件。</p>
+
+<div class="chat">
+  <div class="turn ai"><span class="who">AI</span><span>Q1 — 使用範圍：是自己用，還是家人各自保存食譜？建議先做單人版，電腦和手機都能用。</span></div>
+  <div class="turn"><span class="who">人</span><span>Q1 自己用，手機為主。</span></div>
+  <div class="turn"><span class="who">人</span><span>對了，也可以考慮〈另一套工具〉，比較一下食譜數量和其他面向。</span></div>
+</div>
+<p class="aside">第 3 步和第 2 步交錯進行。回答到一半想到別的選項，直接丟進來比。</p>
+
+<div class="chat">
+  <div class="turn"><span class="who">人</span><span>我同時問了另一個 AI，它是這樣回答的：〈貼上內容〉</span></div>
+  <div class="turn"><span class="who">人</span><span>我猜應該有外掛能解決這些問題？</span></div>
+  <div class="turn"><span class="who">人</span><span>我猜網路上有評測可以看？</span></div>
+  <div class="turn"><span class="who">人</span><span>幫我深入看這些評測，評估適不適合我這種每天都會存好幾筆的用法，也看看有哪些限制和額外費用。</span></div>
+</div>
+<p class="aside">第 2 步。貼別的 AI 的回答、用「我猜」丟給它查、要它對照自己的用法。</p>
+
+<div class="chat">
+  <div class="turn"><span class="who">人</span><span>好，那就用〈另一套工具〉加〈那個外掛〉。我們重新確認規格。我希望可以搜尋兩個網站、顯示預覽圖、存進來。</span></div>
+  <div class="turn ai"><span class="who">AI</span><span>Q1 — 預覽圖片：「顯示預覽圖」是指哪一種？建議顯示封面圖；沒有附圖的就標示未提供。</span></div>
+  <div class="turn"><span class="who">人</span><span>a b c f。f 可以做成能開關的嗎？</span></div>
+</div>
+<p class="aside">第 5 步。方案換了，題號從 Q1 重新來。</p>
+
+<div class="chat">
+  <div class="turn"><span class="who">人</span><span>幫我切成計畫模式。</span></div>
+  <div class="turn ai"><span class="who">AI</span><span>〈一份短計畫，見下一節〉</span></div>
+  <div class="turn"><span class="who">人</span><span>〈在計畫的其中一句上加註〉這個選項可以拿掉。然後我好像沒看到搜尋紀錄要怎麼管理。</span></div>
+  <div class="turn"><span class="who">人</span><span>照這份計畫實作。</span></div>
+</div>
+<p class="aside">第 6 步。計畫也可以加註，改到沒問題才說開始。</p>
+
+<h2>計畫長什麼樣</h2>
+<p>下面是照實際計畫的結構重寫的樣本。標題一句話講要做到什麼，中間幾段用白話寫行為，最後一段寫要檢查哪些情況。</p>
+<pre><code># 搜尋外部食譜並存進來
+
+## 使用流程
+- 在搜尋框輸入關鍵字，結果依來源分開顯示，一次看一個來源。
+- 每筆結果顯示封面圖、標題、來源。沒有圖的標示「未提供」。
+- 按「存進來」之後，食譜出現在自己的清單裡，並記下原始網址。
+
+## 資料與存檔
+- 存進來的食譜保留一份完整內容，原網站下架也看得到。
+- 同一個網址重複存，只更新，不會多一筆。
+- 搜尋紀錄保留最近 20 筆，可以清除。
+
+## 驗收
+- 驗證兩個來源都搜得到、存得進來，重新整理之後還在。
+- 驗證沒有圖、重複存、來源網站連不上這三種情況。
+- 模擬存到一半重新啟動，確認不會留下半筆資料。</code></pre>
+<p>實際的計畫有幾個共同點：</p>
+<ul>
+  <li>用白話寫行為，幾乎不出現程式碼。</li>
+  <li>會寫到出錯的情況怎麼處理，例如重複、連不上、做到一半中斷。</li>
+  <li>驗收段常有「重新啟動之後還在不在」這類檢查。</li>
+</ul>
+
+<h2>第一版做出來之後</h2>
+<p>AI 說做好了不算數。要它部署或啟動起來，然後自己實際操作一遍。接下來就是看到什麼講什麼、一輪一輪改，寫在〈<a href="iteration-workflow.html">問題迭代</a>〉。</p>
+
+<h2>用哪個模型</h2>
+<p>這個階段全程用當下最好的模型，思考程度開到 high 以上。問可行性、比較方案、出題、寫計畫，都是想錯了代價最大的地方。</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>工具</th><th>模型</th><th>思考程度</th></tr></thead>
+  <tbody>
+    <tr><td>Codex（紀錄裡的設定）</td><td><code>gpt-6.2-astra</code></td><td>xhigh</td></tr>
+    <tr><td>Claude Code（對應）</td><td>Fable 或 Opus</td><td>high</td></tr>
+  </tbody>
+</table>
+</div>
+<p class="note">這是額度充足時的設定，一般方案照這樣用會很快用完，建議的用法在最下面。完整的模型使用統計在〈問題迭代〉那一頁。</p>
+
+<h2>這個階段沒有做的事</h2>
+<ul>
+  <li><strong>沒有另外寫規格文件。</strong>規格在第 3 步和第 5 步的問答裡，再由第 6 步壓成一份短計畫。</li>
+  <li><strong>沒有先排好整個專案的進度。</strong>一次只計畫眼前這一個功能。</li>
+  <li><strong>沒有一開始就建立一堆規則檔。</strong></li>
+</ul>
+
+<h2>這份整理的限制</h2>
+<ul>
+  <li>只涵蓋本機還留著的紀錄：2026-10-29 到 11-25，三個專案、六條對話、584 則訊息。</li>
+  <li>出現次數是用關鍵字數的。意思一樣但講法不同的不會算到，所以數字偏低。</li>
+  <li>範例和計畫樣本的題材是虛構的，結構和講法照實際紀錄。</li>
+</ul>
+
+<h2>給新手的建議</h2>
+<div class="tips">
+  <p>下面是假設完全沒有經驗的人要開始，從上面的做法裡挑出來的最小版本。這一段是建議，不是紀錄。</p>
+  <ol>
+    <li><strong>第一句用問的。</strong>「我想做〈某個東西〉，可行性如何？」比「幫我做〈某個東西〉」好。先知道難不難、要不要花錢。</li>
+    <li><strong>有參考對象就貼網址。</strong>想做得像哪個現成的產品，直接貼給它看。</li>
+    <li><strong>請它一題一題問。</strong>照第 3 步的講法貼上去就可以。不知道怎麼選的題目，就照它的建議。</li>
+    <li><strong>看不懂就問「這是什麼意思」。</strong>不用怕問太基本的問題。沒弄懂就說好，後面一定會改。</li>
+    <li><strong>第一版只做一件事。</strong>挑最核心的那一個功能，其他的明講「暫時不用」。第一版越小，越快看到能動的東西。</li>
+    <li><strong>動手前要一份短計畫。</strong>請它寫出會有什麼行為、怎樣算做好。看得懂、也同意了，才說開始。</li>
+    <li><strong>規劃的時候換高一級的模型，開始做就換回預設。</strong>問可行性、出題、寫計畫這幾步想錯的代價最大，值得用好一點的。高階模型額度用得比較快，計畫確認之後就換回工具預設的模型來做。</li>
+    <li><strong>規則檔、子代理這些先不用碰。</strong>等第一版做出來、同樣的問題出現第二次，再回頭學。</li>
+  </ol>
+</div>
+
+<footer>
+  <p class="note">模型定位依據：<a href="https://learn.chatgpt.com/docs/models.md">Codex Models</a>，查於 2026 年 11 月。模型陣容會變，使用前請對照官方頁。</p>
+</footer>
+
+</main>
+</body>
+</html>
